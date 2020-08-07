@@ -18,22 +18,23 @@ class TCPClient {
 	
         Socket clientSocket = new Socket("localhost", 6789); 
 	
-        DataOutputStream outToServer = 
-	    new DataOutputStream(clientSocket.getOutputStream()); 
+        DataOutputStream outToServer = new DataOutputStream(clientSocket.getOutputStream()); 
 	
         
-	BufferedReader inFromServer = 
-	    new BufferedReader(new
-		InputStreamReader(clientSocket.getInputStream())); 
-	
-        sentence = inFromUser.readLine(); 
-	
-        outToServer.writeBytes(sentence + '\n'); 
-	
-        modifiedSentence = inFromServer.readLine(); 
-	
-        System.out.println("FROM SERVER: " + modifiedSentence); 
-	
+	    BufferedReader inFromServer = new BufferedReader(new InputStreamReader(clientSocket.getInputStream())); 
+        while(true){
+            sentence = inFromUser.readLine(); 
+        
+            outToServer.writeBytes(sentence + '\n'); 
+            
+            if(sentence.equals("DONE")){
+                break;
+            }
+
+            modifiedSentence = inFromServer.readLine(); 
+        
+            System.out.println("FROM SERVER: " + modifiedSentence); 
+        }
         clientSocket.close(); 
 	
     } 
