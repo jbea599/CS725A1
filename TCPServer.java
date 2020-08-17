@@ -17,6 +17,7 @@ class TCPServer {
 		while(true){
 			Socket connectionSocket = welcomeSocket.accept(); 
 
+
 			BufferedReader inFromClient = new BufferedReader(new InputStreamReader(connectionSocket.getInputStream())); 
 			
 			DataOutputStream  outToClient = new DataOutputStream(connectionSocket.getOutputStream()); 
@@ -26,16 +27,71 @@ class TCPServer {
 				clientSentence = inFromClient.readLine(); 
 				
 				if(clientSentence.equals("DONE")){
-					
+					outToClient.writeBytes("+localhost closing connection" + '\n');
 					break;
+
+				}else if(clientSentence.contains("USER")){
+
+				}else if(clientSentence.contains("ACCT")){
+
+				}else if(clientSentence.contains("PASS")){
+
+				}else if(clientSentence.contains("TYPE")){
+
+				}else if(clientSentence.contains("LIST")){
+
+				}else if(clientSentence.contains("CDIR")){
+
+				}else if(clientSentence.contains("KILL")){
+
+				}else if(clientSentence.contains("NAME")){
+
+				}else if(clientSentence.contains("RETR")){
+
+				}else if(clientSentence.contains("STOR")){
+
+				}else{
+					outToClient.writeBytes("Invalid Command. Please try again" + '\n'); 
 				}
 				
-				capitalizedSentence = clientSentence.toUpperCase() + '\n'; 
 				
-				outToClient.writeBytes(capitalizedSentence); 
 			} 
 		}
 	}
+
+
+	public void USER(String input){
+
+	}
+	public void ACCT(String input){
+		
+	}
+	public void PASS(String input){
+		
+	}
+	public void TYPE(String input){
+		
+	}
+	public void LIST(String input){
+		
+	}
+	public void CDIR(String input){
+		
+	}
+	public void KILL(String input){
+		
+	}
+	public void NAME(String input){
+		
+	}
+	public void RETR(String input){
+		
+	}
+	public void STOR(String input){
+		
+	}
+	
+
 	
 	
 } 

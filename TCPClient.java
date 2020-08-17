@@ -11,7 +11,7 @@ class TCPClient {
     public static void main(String argv[]) throws Exception 
     { 
         String sentence; 
-        String modifiedSentence; 
+        String response; 
 	
         BufferedReader inFromUser = 
 	    new BufferedReader(new InputStreamReader(System.in)); 
@@ -21,19 +21,21 @@ class TCPClient {
         DataOutputStream outToServer = new DataOutputStream(clientSocket.getOutputStream()); 
 	
         
-	    BufferedReader inFromServer = new BufferedReader(new InputStreamReader(clientSocket.getInputStream())); 
+        BufferedReader inFromServer = new BufferedReader(new InputStreamReader(clientSocket.getInputStream())); 
+
         while(true){
             sentence = inFromUser.readLine(); 
         
             outToServer.writeBytes(sentence + '\n'); 
             
-            if(sentence.equals("DONE")){
+
+            response = inFromServer.readLine();
+
+            
+            System.out.println("FROM SERVER: " + response);
+            if(response.equals("+localhost closing connection")){
                 break;
             }
-
-            modifiedSentence = inFromServer.readLine(); 
-        
-            System.out.println("FROM SERVER: " + modifiedSentence); 
         }
         clientSocket.close(); 
 	
