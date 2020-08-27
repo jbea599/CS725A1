@@ -28,7 +28,7 @@ class TCPClient {
         
             outToServer.writeBytes(sentence + '\n'); 
             
-
+            System.out.println("Waiting for response");
             response = inFromServer.readLine();
 
             
