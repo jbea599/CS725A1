@@ -14,7 +14,6 @@ class TCPClient {
     { 
         String sentence; 
         String response = "";
-        boolean reading = true;
 	
         BufferedReader inFromUser = 
 	    new BufferedReader(new InputStreamReader(System.in)); 

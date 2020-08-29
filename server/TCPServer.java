@@ -20,7 +20,8 @@ class TCPServer {
 	static String parts[];
 	static String nameFile = "";
 	static int transferType = 1; // 1 corresponds to ASCII, 2 coressponds to binary and 3 to Continuous 
-	private static final File defaultDIR = FileSystems.getDefault().getPath("").toFile().getAbsoluteFile();
+	private static File defaultDIR = FileSystems.getDefault().getPath("").toFile().getAbsoluteFile();
+	private static String dirString = defaultDIR.getPath(); 
 
 	public static void main(String argv[]) throws Exception {
 		String clientSentence;
@@ -35,7 +36,6 @@ class TCPServer {
 
 			String response = "testds";
 			while (true) {
-
 				clientSentence = inFromClient.readLine();
 
 				if (clientSentence.equals("DONE")) {
@@ -132,7 +132,7 @@ class TCPServer {
 			return("! guest logged in");
 		}
 
-		File file=new File("users.txt");    //creates a new file instance  
+		File file=new File(dirString + "\\users.txt");    //creates a new file instance  
 		Scanner scanner = new Scanner(file);
 		int lineNum = 0;
     	while (scanner.hasNextLine()) {
@@ -213,9 +213,9 @@ class TCPServer {
 		File filepath;
 		
 		if(dir.equals("\0")){
-			filepath = defaultDIR;
+			filepath = new File(dirString);
 		}else{ 	
-			filepath = FileSystems.getDefault().getPath(dir).toFile().getAbsoluteFile(); 
+			filepath = new File(dirString + "\\" + dir); 
 		}
 
 		files = filepath.listFiles();
@@ -243,8 +243,9 @@ class TCPServer {
 	public static void CDIR(String input){
 		
 	}
+
 	public static String KILL(String input){ // NEED TO CHANGE THIS AS IT USES DEFAULT DIRECTORY
-		File f = new File(input);
+		File f = new File(dirString + "\\" + input);
 		boolean deleted;
 		try {
 			deleted = f.delete();
