@@ -13,7 +13,7 @@ class TCPServer {
 	static boolean userFound = false;
 	static boolean accFound = false;
 	static boolean passFound = false;
-	static int userLine = 0;  
+	static String parts[];
 
 	public static void main(String argv[]) throws Exception {
 		String clientSentence;
@@ -46,19 +46,47 @@ class TCPServer {
 					response = TCPServer.PASS(clientSentence.substring(5));
 
 				} else if (clientSentence.contains("TYPE")) {
+					if(TCPServer.loggedin == true){
 
+					}else{
+						outToClient.writeBytes("! Cannot use this function until logged-in" + '\n');
+					}
 				} else if (clientSentence.contains("LIST")) {
+					if(TCPServer.loggedin == true){
 
+					}else{
+						outToClient.writeBytes("! Cannot use this function until logged-in" + '\n');
+					}
 				} else if (clientSentence.contains("CDIR")) {
+					if(TCPServer.loggedin == true){
 
+					}else{
+						outToClient.writeBytes("! Cannot use this function until logged-in" + '\n');
+					}
 				} else if (clientSentence.contains("KILL")) {
+					if(TCPServer.loggedin == true){
 
+					}else{
+						outToClient.writeBytes("! Cannot use this function until logged-in" + '\n');
+					}
 				} else if (clientSentence.contains("NAME")) {
+					if(TCPServer.loggedin == true){
 
+					}else{
+						outToClient.writeBytes("! Cannot use this function until logged-in" + '\n');
+					}
 				} else if (clientSentence.contains("RETR")) {
+					if(TCPServer.loggedin == true){
 
+					}else{
+						outToClient.writeBytes("! Cannot use this function until logged-in" + '\n');
+					}
 				} else if (clientSentence.contains("STOR")) {
+					if(TCPServer.loggedin == true){
 
+					}else{
+						outToClient.writeBytes("! Cannot use this function until logged-in" + '\n');
+					}
 				} else {
 					response = "Invalid Command. Please try again";
 				}
@@ -82,11 +110,10 @@ class TCPServer {
     	while (scanner.hasNextLine()) {
 			String line = scanner.nextLine();
 			lineNum++;
-			String parts[] = line.split(" ");
+			TCPServer.parts = line.split(" ");
 			System.out.println(parts[0] + " " + parts[1] + " " + parts[2]);
 			if(parts[0].contains(input)) {
 				System.out.println("found the username on line: " + lineNum);
-				TCPServer.userLine = lineNum;
 				TCPServer.userFound = true;
 				break;
 			}
@@ -100,21 +127,13 @@ class TCPServer {
 	}
 
 	public static String ACCT(String input) throws FileNotFoundException {
+		System.out.println(parts[1]);
+		System.out.println(input);
 
-		File file=new File("users.txt");    //creates a new file instance  
-		Scanner scanner = new Scanner(file);
-		int lineNum = 0;
-    	while (scanner.hasNextLine()) {
-			String line = scanner.nextLine();
-			lineNum++;
-			String parts[] = line.split(" ");
-			System.out.println(parts[0] + " " + parts[1] + " " + parts[2]);
-			if(parts[1].contains(input) & (lineNum == TCPServer.userLine)) {
-				System.out.println("found the account on line: " + lineNum);
-				TCPServer.accFound = true;
-				break;
-			}
+		if(parts[1].equals(input)) {
+			TCPServer.accFound = true;
 		}
+		
 		if(TCPServer.accFound == false){
 			return("- Invalid account, try again");
 		}else if(TCPServer.accFound == true && TCPServer.passFound == false){
@@ -125,23 +144,15 @@ class TCPServer {
 		}
 	}
 	public static String PASS(String input) throws FileNotFoundException {
-
-		File file=new File("users.txt");    //creates a new file instance  
-		Scanner scanner = new Scanner(file);
-		int lineNum = 0;
-    	while (scanner.hasNextLine()) {
-			String line = scanner.nextLine();
-			lineNum++;
-			String parts[] = line.split(" ");
-			System.out.println(parts[0] + " " + parts[1] + " " + parts[2]);
-			if(parts[2].contains(input) & (lineNum == TCPServer.userLine)) {
-				System.out.println("found the account on line: " + lineNum);
-				TCPServer.passFound = true;
-				break;
-			}
+		System.out.println(parts[2]);
+		System.out.println(input);
+		
+		if(parts[2].equals(input)) {
+			TCPServer.passFound = true;
 		}
+		
 		if(TCPServer.passFound == false){
-			return("- wrong password, try again");
+			return("- Wrong password, try again");
 		}else if(TCPServer.passFound == true && TCPServer.accFound == false){
 			return("+ Send account");
 		}else{
@@ -149,7 +160,6 @@ class TCPServer {
 			return("! Logged-in");
 		}
 	}
-
 
 	public static void TYPE(String input){
 		
