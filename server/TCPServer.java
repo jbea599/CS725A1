@@ -60,7 +60,17 @@ class TCPServer {
 					}
 				} else if (clientSentence.contains("LIST")) {
 					if(TCPServer.loggedin == true){
-						response = TCPServer.LIST(clientSentence.substring(5), outToClient);
+						ArrayList<String> ar = new ArrayList<String>();
+						String test[] = clientSentence.split(" ");
+
+						ar.add(test[0]);
+						ar.add(test[1]);
+						if(test.length == 2){
+							ar.add("\0");
+						}else{
+							ar.add(test[2]);
+						}
+						response = TCPServer.LIST(ar.get(1).toString(), ar.get(2).toString(), outToClient);
 					}else{
 						response = "! Cannot use this function until logged-in";
 					}
@@ -186,9 +196,21 @@ class TCPServer {
 		}
 
 	}
-	public static String LIST(String input, DataOutputStream outToClient) throws IOException {
-		File files[] = defaultDIR.listFiles();
-		String response = defaultDIR.getAbsolutePath();
+	public static String LIST(String input, String dir, DataOutputStream outToClient) throws IOException {
+		
+		File files[];
+		String response = "";
+		File filepath;
+		
+		if(dir.equals("\0")){
+			filepath = defaultDIR;
+		}else{ 	
+			filepath = FileSystems.getDefault().getPath(dir).toFile().getAbsoluteFile(); 
+		}
+
+		files = filepath.listFiles();
+
+		response = filepath.getAbsolutePath();
 		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy kk:mm");
 
 		if(input.equals("F") || input.equals("V")){
