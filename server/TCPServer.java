@@ -18,6 +18,7 @@ class TCPServer {
 	static boolean accFound = false;
 	static boolean passFound = false;
 	static String parts[];
+	static String nameFile = "";
 	static int transferType = 1; // 1 corresponds to ASCII, 2 coressponds to binary and 3 to Continuous 
 	private static final File defaultDIR = FileSystems.getDefault().getPath("").toFile().getAbsoluteFile();
 
@@ -259,13 +260,34 @@ class TCPServer {
 	}
 
 	public static String NAME(String input){
-		return("");
+
+		String files[] = defaultDIR.list();
+		for(String s: files){
+			if(s.equals(input)){
+				System.out.println(s + " " + input);
+				TCPServer.nameFile = input;
+				return ("+ File exists");
+			}
+		}
+		return ("- Can't find " + input);
 	}
 
 	public static String TOBE(String input){
-		return("");
-	}
+		File file = new File(TCPServer.nameFile);
 
+		File file2 = new File(input);
+
+		if (file2.exists()){
+			return("- File  already exists");
+		}
+		boolean success = file.renameTo(file2);
+		if(success){
+			return(TCPServer.nameFile + " renamed to " + input);
+		}else{
+			return("- An unknown error occured");
+		}
+	}
+	
 	public static void RETR(String input){
 		
 	}
