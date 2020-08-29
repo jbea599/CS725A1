@@ -14,6 +14,7 @@ class TCPServer {
 	static boolean accFound = false;
 	static boolean passFound = false;
 	static String parts[];
+	static int transferType = 1; // 1 corresponds to ASCII, 2 coressponds to binary and 3 to Continuous 
 
 	public static void main(String argv[]) throws Exception {
 		String clientSentence;
@@ -47,7 +48,7 @@ class TCPServer {
 
 				} else if (clientSentence.contains("TYPE")) {
 					if(TCPServer.loggedin == true){
-
+						response = TCPServer.TYPE(clientSentence.substring(5));
 					}else{
 						outToClient.writeBytes("! Cannot use this function until logged-in" + '\n');
 					}
@@ -161,8 +162,20 @@ class TCPServer {
 		}
 	}
 
-	public static void TYPE(String input){
-		
+	public static String TYPE(String input){
+		if(input.equals("a")){
+			TCPServer.transferType = 1;
+			return("+ Using Ascii mode");
+		}else if(input.equals("b")){
+			TCPServer.transferType = 2;
+			return("+ Using Binary mode");
+		}else if(input.equals("c")){
+			TCPServer.transferType = 3;
+			return("+ Using Continuous mode");
+		}else{
+			return("- Type not valid");
+		}
+
 	}
 	public static void LIST(String input){
 		
