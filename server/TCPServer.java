@@ -82,16 +82,23 @@ class TCPServer {
 					}
 				} else if (clientSentence.contains("KILL")) {
 					if(TCPServer.loggedin == true){
-
+						response = TCPServer.KILL(clientSentence.substring(5));
 					}else{
 						response = "! Cannot use this function until logged-in";
 					}
 				} else if (clientSentence.contains("NAME")) {
 					if(TCPServer.loggedin == true){
-
+						response = TCPServer.NAME(clientSentence.substring(5));
 					}else{
 						response = "! Cannot use this function until logged-in";
 					}
+				} else if(clientSentence.contains("TOBE")){
+					if(TCPServer.loggedin == true){
+						response = TCPServer.TOBE(clientSentence.substring(5));
+					}else{
+						response = "! Cannot use this function until logged-in";
+					}
+
 				} else if (clientSentence.contains("RETR")) {
 					if(TCPServer.loggedin == true){
 
@@ -163,6 +170,7 @@ class TCPServer {
 			return("! Account valid, logged-in");
 		}
 	}
+
 	public static String PASS(String input) throws FileNotFoundException {
 		System.out.println(parts[2]);
 		System.out.println(input);
@@ -196,6 +204,7 @@ class TCPServer {
 		}
 
 	}
+
 	public static String LIST(String input, String dir, DataOutputStream outToClient) throws IOException {
 		
 		File files[];
@@ -233,12 +242,30 @@ class TCPServer {
 	public static void CDIR(String input){
 		
 	}
-	public static void KILL(String input){
+	public static String KILL(String input){ // NEED TO CHANGE THIS AS IT USES DEFAULT DIRECTORY
+		File f = new File(input);
+		boolean deleted;
+		try {
+			deleted = f.delete();
+		} catch (Exception e) {
+			return("Error");
+		}
 		
+		if(deleted){
+			return("+ File deleted");
+		}else{
+			return("- Invalid file");
+		}
 	}
-	public static void NAME(String input){
-		
+
+	public static String NAME(String input){
+		return("");
 	}
+
+	public static String TOBE(String input){
+		return("");
+	}
+
 	public static void RETR(String input){
 		
 	}
