@@ -6,9 +6,11 @@ package server;
  * All Rights Reserved.
  **/
 
-import java.io.*; 
+import java.io.*;
 import java.net.*;
 import java.util.*;
+import java.nio.file.*;
+import java.text.SimpleDateFormat;
 
 class TCPServer { 
 	static boolean loggedin = false;
@@ -17,6 +19,7 @@ class TCPServer {
 	static boolean passFound = false;
 	static String parts[];
 	static int transferType = 1; // 1 corresponds to ASCII, 2 coressponds to binary and 3 to Continuous 
+	private static final File defaultDIR = FileSystems.getDefault().getPath("").toFile().getAbsoluteFile();
 
 	public static void main(String argv[]) throws Exception {
 		String clientSentence;
@@ -35,12 +38,13 @@ class TCPServer {
 				clientSentence = inFromClient.readLine();
 
 				if (clientSentence.equals("DONE")) {
-					outToClient.writeBytes("+localhost closing connection" + '\n');
+					outToClient.writeBytes("+localhost closing connection");
 					TCPServer.RESET();
 					break;
 
 				} else if (clientSentence.contains("USER")) {
 					response = TCPServer.USER(clientSentence.substring(5));
+					System.out.println(defaultDIR);
 
 				} else if (clientSentence.contains("ACCT")) {
 					response = TCPServer.ACCT(clientSentence.substring(5));
@@ -52,50 +56,53 @@ class TCPServer {
 					if(TCPServer.loggedin == true){
 						response = TCPServer.TYPE(clientSentence.substring(5));
 					}else{
-						outToClient.writeBytes("! Cannot use this function until logged-in" + '\n');
+						response = "! Cannot use this function until logged-in";
 					}
 				} else if (clientSentence.contains("LIST")) {
 					if(TCPServer.loggedin == true){
-
+						response = TCPServer.LIST(clientSentence.substring(5), outToClient);
 					}else{
-						outToClient.writeBytes("! Cannot use this function until logged-in" + '\n');
+						response = "! Cannot use this function until logged-in";
 					}
 				} else if (clientSentence.contains("CDIR")) {
 					if(TCPServer.loggedin == true){
 
 					}else{
-						outToClient.writeBytes("! Cannot use this function until logged-in" + '\n');
+						response = "! Cannot use this function until logged-in";
 					}
 				} else if (clientSentence.contains("KILL")) {
 					if(TCPServer.loggedin == true){
 
 					}else{
-						outToClient.writeBytes("! Cannot use this function until logged-in" + '\n');
+						response = "! Cannot use this function until logged-in";
 					}
 				} else if (clientSentence.contains("NAME")) {
 					if(TCPServer.loggedin == true){
 
 					}else{
-						outToClient.writeBytes("! Cannot use this function until logged-in" + '\n');
+						response = "! Cannot use this function until logged-in";
 					}
 				} else if (clientSentence.contains("RETR")) {
 					if(TCPServer.loggedin == true){
 
 					}else{
-						outToClient.writeBytes("! Cannot use this function until logged-in" + '\n');
+						response = "! Cannot use this function until logged-in";
 					}
 				} else if (clientSentence.contains("STOR")) {
 					if(TCPServer.loggedin == true){
 
 					}else{
-						outToClient.writeBytes("! Cannot use this function until logged-in" + '\n');
+						response = "! Cannot use this function until logged-in";
 					}
 				} else {
 					response = "Invalid Command. Please try again";
 				}
-				System.out.println(response);
-				outToClient.writeBytes(response + '\n');
-
+				if(!(response.equals("NO RESPONSE"))){
+					System.out.println(response);
+					outToClient.writeBytes(response + '\0');
+				}else{
+					System.out.println("response already sent in function");
+				}
 			}
 		}
 	}
@@ -179,9 +186,28 @@ class TCPServer {
 		}
 
 	}
-	public static void LIST(String input){
-		
+	public static String LIST(String input, DataOutputStream outToClient) throws IOException {
+		File files[] = defaultDIR.listFiles();
+		String response = defaultDIR.getAbsolutePath();
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy kk:mm");
+
+		if(input.equals("F") || input.equals("V")){
+			for(File file : files){
+				response = response + '\n' + file.getName();
+				if(input.equals("V")){
+					long modifiedTime = file.lastModified();
+					String modifiedDate = dateFormat.format(new Date(modifiedTime));
+					response += "    " + modifiedDate + "    SIZE: " + file.length();
+
+				}
+
+			}
+		}else{
+			response = "- Invalid listing type, choose F or V";
+		}
+		return(response);
 	}
+
 	public static void CDIR(String input){
 		
 	}

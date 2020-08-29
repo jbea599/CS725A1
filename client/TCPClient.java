@@ -13,7 +13,8 @@ class TCPClient {
     public static void main(String argv[]) throws Exception 
     { 
         String sentence; 
-        String response; 
+        String response = "";
+        boolean reading = true;
 	
         BufferedReader inFromUser = 
 	    new BufferedReader(new InputStreamReader(System.in)); 
@@ -25,13 +26,22 @@ class TCPClient {
         
         BufferedReader inFromServer = new BufferedReader(new InputStreamReader(clientSocket.getInputStream())); 
 
+        int character = 0;
+
         while(true){
             sentence = inFromUser.readLine(); 
         
             outToServer.writeBytes(sentence + '\n'); 
             
             System.out.println("Waiting for response");
-            response = inFromServer.readLine();
+            response = "";
+            while(true){
+                character = inFromServer.read();
+                if(character == 0){
+                    break;
+                }
+                response = response.concat(Character.toString((char)character));
+            }
 
             
             System.out.println("FROM SERVER: " + response);
