@@ -77,7 +77,7 @@ class TCPServer {
 					}
 				} else if (clientSentence.contains("CDIR")) {
 					if(TCPServer.loggedin == true){
-
+						response = TCPServer.CDIR(clientSentence.substring(5));
 					}else{
 						response = "! Cannot use this function until logged-in";
 					}
@@ -240,8 +240,17 @@ class TCPServer {
 		return(response);
 	}
 
-	public static void CDIR(String input){
-		
+	public static String CDIR(String input){
+		String newDir = TCPServer.dirString + "\\" + input;
+		System.out.println(newDir);
+		File newDirFILE = new File(newDir);
+		if(newDirFILE.isDirectory()){
+			TCPServer.dirString = newDir;
+			return("! Changed working dir to " + input);
+		}else{
+			return("- Can't connect to directory because: directory does not exist");
+		}
+
 	}
 
 	public static String KILL(String input){ // NEED TO CHANGE THIS AS IT USES DEFAULT DIRECTORY
