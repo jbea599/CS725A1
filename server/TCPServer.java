@@ -1,5 +1,3 @@
-package server;
-
 /**
  * Code is taken from Computer Networking: A Top-Down Approach Featuring 
  * the Internet, second edition, copyright 1996-2002 J.F Kurose and K.W. Ross, 
@@ -11,6 +9,7 @@ import java.net.*;
 import java.util.*;
 import java.nio.file.*;
 import java.text.SimpleDateFormat;
+import java.util.concurrent.TimeUnit;
 
 class TCPServer { 
 	static boolean loggedin = false;
@@ -22,6 +21,8 @@ class TCPServer {
 	static int transferType = 1; // 1 corresponds to ASCII, 2 coressponds to binary and 3 to Continuous 
 	private static File defaultDIR = FileSystems.getDefault().getPath("").toFile().getAbsoluteFile();
 	private static String dirString = defaultDIR.getPath(); 
+	static private DataOutputStream dataOutToClient;
+
 
 	public static void main(String argv[]) throws Exception {
 		String clientSentence;
@@ -33,9 +34,12 @@ class TCPServer {
 			BufferedReader inFromClient = new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
 
 			DataOutputStream outToClient = new DataOutputStream(connectionSocket.getOutputStream());
-
+			TCPServer.dataOutToClient = new DataOutputStream(connectionSocket.getOutputStream()); // create byte-based stream output
 			String response = "testds";
+			outToClient.writeBytes("+ Localhost SFTP service" + '\n');
 			while (true) {
+				System.out.println(dirString);
+				System.out.println("Working Directory = " + System.getProperty("user.dir"));
 				clientSentence = inFromClient.readLine();
 
 				if (clientSentence.equals("DONE")) {
@@ -102,13 +106,13 @@ class TCPServer {
 
 				} else if (clientSentence.contains("RETR")) {
 					if(TCPServer.loggedin == true){
-
+						response = TCPServer.RETR(clientSentence.substring(5), outToClient, inFromClient);
 					}else{
 						response = "! Cannot use this function until logged-in";
 					}
 				} else if (clientSentence.contains("STOR")) {
 					if(TCPServer.loggedin == true){
-
+						response = TCPServer.STOR(clientSentence.substring(5));
 					}else{
 						response = "! Cannot use this function until logged-in";
 					}
@@ -241,19 +245,25 @@ class TCPServer {
 	}
 
 	public static String CDIR(String input){
-		String newDir = TCPServer.dirString + "\\" + input;
-		System.out.println(newDir);
-		File newDirFILE = new File(newDir);
-		if(newDirFILE.isDirectory()){
-			TCPServer.dirString = newDir;
-			return("! Changed working dir to " + input);
+		
+		if(input.contains("~")){
+			TCPServer.dirString = defaultDIR.getPath();
+			return("! Changed working dir to default");
+			
 		}else{
-			return("- Can't connect to directory because: directory does not exist");
+			String newDir = TCPServer.dirString + "\\" + input;
+			System.out.println(newDir);
+			File newDirFILE = new File(newDir);
+			if(newDirFILE.isDirectory()){
+				TCPServer.dirString = newDir;
+				return("! Changed working dir to " + input);
+			}else{
+				return("- Can't connect to directory because: directory does not exist");
+			}
 		}
-
 	}
 
-	public static String KILL(String input){ // NEED TO CHANGE THIS AS IT USES DEFAULT DIRECTORY
+	public static String KILL(String input){ 
 		File f = new File(dirString + "\\" + input);
 		boolean deleted;
 		try {
@@ -298,10 +308,44 @@ class TCPServer {
 		}
 	}
 	
-	public static void RETR(String input){
-		
+	public static String RETR(String input, DataOutputStream outToClient, BufferedReader inFromClient) throws IOException,
+			InterruptedException {
+		File file1 = new File(input);
+		System.out.println("Inside RETR");
+		if(file1.exists()){
+			long filesize = file1.length();
+			outToClient.writeBytes(String.valueOf(filesize) + '\0');
+			System.out.println("Waiting for response");
+			String cResponse = inFromClient.readLine();
+			if(cResponse.equals("SEND")){
+				System.out.println("Received send response, sending data");
+				byte[] byteBuffer = new byte[(int) file1.length()];
+				int bytesCounter; 
+				FileInputStream fs = new FileInputStream(file1);
+				BufferedInputStream binaryStream = new BufferedInputStream(fs);
+				while ((bytesCounter = binaryStream.read(byteBuffer)) >= 0) {
+					dataOutToClient.write(byteBuffer, 0, bytesCounter);
+				}
+				binaryStream.close();
+				fs.close();
+				dataOutToClient.flush();
+				TimeUnit.SECONDS.sleep(2);
+				System.out.println("Finished sending");
+
+			}else{ 
+				System.out.println("received a stop response, finsihing");
+				return("+ ok, RETR aborted");
+			}
+
+
+		}else{
+			return("- File doesn't exist");
+		}
+
+		return("Finished sending");
 	}
-	public static void STOR(String input){
+	public static String STOR(String input){
+		return("");
 		
 	}
 
